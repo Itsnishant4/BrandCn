@@ -1,36 +1,95 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# **BrandCn – Shadcn Brand Theme Collection**
 
-## Getting Started
+BrandCn is a small open-source project where I’m trying to collect **different brand themes** (Google, Youtube, Netflix, Apple, etc) that you can use directly with **shadcn/ui**.
+Nothing fancy. Just simple theme files you can **copy and paste** into your main CSS and boom… your UI looks like that brand.
 
-First, run the development server:
+---
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## 🍋 How To Use (Super Easy)
+
+Honestly, using this repo is very simple:
+
+1. Open any brand theme file
+2. Copy all the CSS vars from it
+3. Paste them inside your project’s main css (like `globals.css` or `styles.css`)
+
+Example:
+
+```css
+/* Paste theme here */
+:root {
+  --background: #fff;
+  --foreground: #000;
+  --primary: #4285f4;
+  --primary-foreground: #fff;
+}
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+And you’re done.
+No setup, no magic, no headache. Just copy → paste → use.
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 🎨 What You Get
 
-## Learn More
+Right now themes available:
 
-To learn more about Next.js, take a look at the following resources:
+* Google
+* YouTube
+* Netflix
+* Apple
+* Github
+* Instagram
+* And many more coming when I have time 😅
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Each theme comes with mapped variables like:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+* `--background`
+* `--foreground`
+* `--primary`
+* `--card`
+* `--border`
+* `--popover`
+* etc…
 
-## Deploy on Vercel
+So Shadcn components automatically follow the brand vibe.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+---
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 💛 Why I Made This
+
+Because everytime I wanted a specific vibe for a UI, I was manually picking colors like a fool.
+So I thought, **why not make a repo and keep all brand themes in one easy place?**
+
+Also maybe other developers can use it too.
+Sharing is caring 😌
+
+---
+
+## 📄 License (Very Important)
+
+BrandCn is open source under **GPL-3.0**.
+So if you **modify** or **redistribute** this project:
+
+➡️ You must also keep your version **open-source**
+➡️ And also release it under the **same license**
+
+Fair and square.
+
+---
+
+## 🤝 Contribute (If you feel like)
+
+* Add a new brand theme
+* Fix one of my spelling mistakes 😂
+* Improve existing themes
+* Anything helpful is welcome
+
+Just make a PR, I’ll try to check fast.
+
+---
+
+## ⭐ If You Like It
+
+Give the repo a **star** ⭐
+Makes my day happy & helps more devs find it.
