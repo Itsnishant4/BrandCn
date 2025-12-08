@@ -6,7 +6,7 @@ Nothing crazy.
 Just simple CSS theme files you can **copy → paste → boom 💥** your whole UI starts vibing like that brand.
 
 ---
-![Alt text](https://firebasestorage.googleapis.com/v0/b/ganesha-9f5a9.appspot.com/o/uploads%2F1765183060277_Screenshot%202025-12-08%20at%202.05.03%E2%80%AFPM.png?alt=media&token=43116b41-02f6-40d5-b52b-b4ed2271bd4c)
+![Brand cn](https://firebasestorage.googleapis.com/v0/b/ganesha-9f5a9.appspot.com/o/uploads%2F1765183060277_Screenshot%202025-12-08%20at%202.05.03%E2%80%AFPM.png?alt=media&token=43116b41-02f6-40d5-b52b-b4ed2271bd4c)
 ---
 
 ## 🍋 How To Use (Superrr Easy)
@@ -60,13 +60,7 @@ Each theme comes with variables like:
 So your Shadcn components **autometicly** (yes spelled wrong 🙈) follow the brand style.
 
 ---
-
-
-
-
-```
-![Brand Preview](./images/google-preview.png)
-```
+![Trending](https://firebasestorage.googleapis.com/v0/b/ganesha-9f5a9.appspot.com/o/uploads%2F1765183018611_localhost_3001_%20(1).png?alt=media&token=949eb470-a576-4d11-ab6a-93cbb06fcee0)
 ---
 
 ## 💛 Why I Even Made This
