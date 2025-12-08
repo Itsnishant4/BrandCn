@@ -64,7 +64,7 @@ export default function AdminPage() {
             const response = await fetch('/api/themes')
             if (response.ok) {
                 const data = await response.json()
-                setThemes(data)
+                setThemes(data.themes || [])
             }
         } catch (error) {
             console.error('Error fetching themes:', error)
