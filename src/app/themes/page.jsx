@@ -205,7 +205,7 @@ export default function ThemesPage() {
                             className="pl-9 border-border bg-muted focus:bg-card transition-all"
                         />
                     </div>
-                    <div>
+                    <div className='flex flex-row gap-2'>
                     <div className="">
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
@@ -386,14 +386,15 @@ export default function ThemesPage() {
                                             ) : (
                                                 <>
                                                     <Copy className="mr-1 h-3.5 w-3.5" />
-                                                    Copy
+                                                            <span className='md:block hidden'>Copy</span>
                                                 </>
                                             )}
                                         </Button>
                                         <Button size="sm" variant="ghost" asChild className="h-8 px-2 hover:bg-background">
                                             <Link href={`/themes/${theme.slug}`}>
                                                 <Eye className="mr-1 h-3.5 w-3.5" />
-                                                View
+                                                    <span className='md:block hidden'>View</span>
+                                                
                                             </Link>
                                         </Button>
                                     </div>

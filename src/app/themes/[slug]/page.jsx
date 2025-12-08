@@ -102,9 +102,9 @@ export default function ThemeDetailPage() {
     if (!theme) return <div className="h-screen flex items-center justify-center">Theme not found</div>;
 
     return (
-        <div className="min-h-screen md:w-5xl mx-auto bg-background text-foreground font-sans selection:bg-purple-100">
+        <div className="min-h-screen md:w-5xl w-full mx-auto bg-background text-foreground font-sans selection:bg-purple-100">
 
-            <div className="sticky top-0 z-50 w-5xl border-b bg-background/80 backdrop-blur-md">
+            <div className="sticky top-0 z-50 md:w-5xl border-b bg-background/80 backdrop-blur-md">
                 <div className="max-w-5xl mx-auto h-16 flex items-center justify-between ">
                     <div className="flex items-center gap-4">
                         <Button variant="ghost" size="icon" asChild className="rounded-full text-muted-foreground hover:text-foreground">
@@ -116,17 +116,17 @@ export default function ThemeDetailPage() {
                             <Badge variant="secondary" className="hidden sm:inline-flex bg-muted text-muted-foreground">{theme.category}</Badge>
                         </div>
                     </div>
-                    <Button onClick={handleCopy} className={copied ? "bg-green-600 hover:bg-green-700 text-white" : ""}>
+                    <Button onClick={handleCopy} className={copied ? "bg-green-600 hover:bg-green-700 text-white " : "mr-2!"}>
                         {copied ? <Check className="mr-2 h-4 w-4" /> : <Copy className="mr-2 h-4 w-4" />}
                         {copied ? "Copied!" : "Copy CSS"}
                     </Button>
                 </div>
             </div>
 
-            {/* --- MAIN CONTENT --- */}
+     
             <main className="max-w-5xl mx-auto pb-20">
 
-                {/* AMBIENT HEADER BACKGROUND */}
+         
                 <motion.div
                     className="relative w-full h-48 md:h-64 bg-gradient-to-r from-pink-400 via-purple-400 to-indigo-400 overflow-hidden"
                     animate={{ backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"] }}
