@@ -205,6 +205,7 @@ export default function ThemesPage() {
                             className="pl-9 border-border bg-muted focus:bg-card transition-all"
                         />
                     </div>
+                    <div>
                     <div className="">
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
@@ -258,6 +259,7 @@ export default function ThemesPage() {
                         >
                             <List className="h-4 w-4" />
                         </Button>
+                    </div>
                     </div>
                 </motion.div>
             </div>
