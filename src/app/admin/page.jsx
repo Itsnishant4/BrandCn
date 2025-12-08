@@ -15,6 +15,10 @@ export default function AdminPage() {
     const [authError, setAuthError] = useState('')
     const [themes, setThemes] = useState([])
     const [loading, setLoading] = useState(true)
+    const [loadingMore, setLoadingMore] = useState(false)
+    const [currentPage, setCurrentPage] = useState(1)
+    const [hasMore, setHasMore] = useState(true)
+    const [hasMorePages, setHasMorePages] = useState(true)
 
     useEffect(() => {
         const authStatus = localStorage.getItem('adminAuthenticated')
@@ -23,6 +27,25 @@ export default function AdminPage() {
         }
         fetchThemes()
     }, [])
+
+    useEffect(() => {
+        // Add scroll event listener to window for infinite scroll
+        const handleWindowScroll = () => {
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop
+            const windowHeight = window.innerHeight
+            const bodyHeight = document.documentElement.scrollHeight
+            const isNearBottom = scrollTop + windowHeight >= bodyHeight - 100
+
+            if (isNearBottom && hasMorePages && !loadingMore) {
+                loadMoreThemes()
+            }
+        }
+
+        if (isAuthenticated) {
+            window.addEventListener('scroll', handleWindowScroll)
+            return () => window.removeEventListener('scroll', handleWindowScroll)
+        }
+    }, [isAuthenticated, hasMorePages, loadingMore])
 
     const handleLogin = async () => {
         if (!password.trim()) {
@@ -59,17 +82,40 @@ export default function AdminPage() {
         }
     }
 
-    const fetchThemes = async () => {
+    const fetchThemes = async (page = 1, append = false) => {
         try {
-            const response = await fetch('/api/themes')
+            const isLoadingMore = append
+            setLoadingMore(append)
+            setLoading(!append)
+
+            const response = await fetch(`/api/themes?page=${page}&limit=12`)
             if (response.ok) {
                 const data = await response.json()
-                setThemes(data.themes || [])
+
+                if (append) {
+                    setThemes(prev => [...prev, ...data.themes])
+                } else {
+                    setThemes(data.themes || [])
+                }
+
+                setHasMore(data.pagination.hasNext)
+                setHasMorePages(page < data.pagination.totalPages)
+                if (append) {
+                    setCurrentPage(page)
+                }
             }
         } catch (error) {
             console.error('Error fetching themes:', error)
         } finally {
             setLoading(false)
+            setLoadingMore(false)
+        }
+    }
+
+    const loadMoreThemes = async () => {
+        if (!loadingMore && hasMorePages) {
+            const nextPage = currentPage + 1
+            await fetchThemes(nextPage, true)
         }
     }
 
@@ -180,7 +226,16 @@ export default function AdminPage() {
                     ))}
                 </div>
 
-                {themes.length === 0 && (
+                {loadingMore && (
+                    <div className="flex justify-center py-8">
+                        <div className="flex items-center gap-2">
+                            <Loader2 className="w-5 h-5 animate-spin" />
+                            <span className="text-muted-foreground">Loading more themes...</span>
+                        </div>
+                    </div>
+                )}
+
+                {themes.length === 0 && !loadingMore && (
                     <div className="text-center py-12">
                         <p className="text-muted-foreground">No themes found.</p>
                         <Button asChild className="mt-4">
