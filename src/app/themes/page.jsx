@@ -355,7 +355,7 @@ export default function ThemesPage() {
                                     </Card>
                                 </motion.div>
                             ) : (
-                                <motion.div key={theme.id} layout className="group flex w-3xl mx-auto items-center gap-4 p-4 border-b border-border hover:bg-muted/50 transition-colors duration-200">
+                                <motion.div key={theme.id} layout className="group flex w-full md:w-3xl mx-auto items-center gap-4 p-4 border-b border-border hover:bg-muted/50 transition-colors duration-200">
                                     <div className="relative h-12 w-12 bg-linear-to-br from-muted to-accent rounded p-1.5 flex items-center justify-center shrink-0 group-hover:from-purple-50 group-hover:to-indigo-50 transition-colors duration-500">
                                         <Image
                                             src={`${theme.icon_url}`}
