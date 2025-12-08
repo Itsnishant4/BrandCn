@@ -527,14 +527,36 @@ const TESTIMONIALS = [
 const FAQS = [
   {
     question: "Is this free to use?",
-    answer: "Yes, 100% free and open source. You can use these themes in commercial projects."
+    answer: "Yep, totally free and open source 🍋. Use it in personal or commercial projects, no problem at all."
   },
   {
     question: "Does it work with Tailwind v4?",
-    answer: "Yes, the CSS variables are standard and compatible with the new Tailwind engine."
+    answer: "Yesss 😎 all themes use simple CSS vars, so they work fine with Tailwind v4's new engine."
   },
   {
-    question: "How do I add my own theme?",
-    answer: "Click the 'Submit Theme' button in the top right. We review submissions daily."
+    question: "How do I use a theme?",
+    answer: "Just open the theme file → copy the variables → paste inside your main CSS file. That's literally it 💥."
+  },
+  {
+    question: "Do I need to install any npm package?",
+    answer: "Nope! Zero installation, zero nonsense. Just copy and paste the code 😌."
+  },
+  {
+    question: "Will you add more brand themes?",
+    answer: "Yes ofc! Slowly adding more when I get time ⏳. You can also contribute if you want 💛."
+  },
+  {
+    question: "Can i use this in my client projects?",
+    answer: "Absolutely yes 🙌. Just follow the open-source license rules if you modify the repo."
+  },
+  {
+    question: "Where can I add preview images?",
+    answer: "You can put them inside an /images folder and link them in your README using markdown 🖼️."
+  },
+  {
+    question: "Can I contribute new themes?",
+    answer: "Yup! Just submit a PR with your theme file and I'll check it fast (unless I'm sleeping 😴)."
   }
-]
+];
+
+

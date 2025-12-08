@@ -29,7 +29,6 @@ const GitHubStats = () => {
       <Github className="h-4 w-4" />
       {stars !== null && (
         <span className="flex items-center gap-1">
-          <Star className="h-3 w-3 fill-current" />
           {stars.toLocaleString()}
         </span>
       )}

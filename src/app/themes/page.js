@@ -11,26 +11,9 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { motion } from 'framer-motion'
 import Image from 'next/image'
 import Header from '@/components/Header'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 
-const CustomSelect = ({ value, onChange, options }) => (
-    <div className="relative">
-        <Filter className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground pointer-events-none" />
-        <select
-            value={value}
-            onChange={(e) => onChange(e.target.value)}
-            className="h-9 w-full appearance-none rounded-md border border-border bg-card pl-9 pr-8 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-        >
-            {options.map((opt) => (
-                <option key={opt.value} value={opt.value}>
-                    {opt.label}
-                </option>
-            ))}
-        </select>
-        <div className="absolute right-3 top-3 h-4 w-4 pointer-events-none opacity-50">
-            <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6" /></svg>
-        </div>
-    </div>
-);
+
 
 export default function ThemesPage() {
     const [themes, setThemes] = useState([])
@@ -222,44 +205,40 @@ export default function ThemesPage() {
                             className="pl-9 border-border bg-muted focus:bg-card transition-all"
                         />
                     </div>
-                    <div className="w-full sm:w-[200px]">
-                        <CustomSelect
-                            value={category}
-                            onChange={setCategory}
-                            options={[
-                                { value: "all", label: "All Categories" },
-                                { value: "company", label: "Company" },
-                                { value: "framework", label: "Framework" },
-                                { value: "product", label: "Product" },
-                                { value: "tool", label: "Tool" },
-                            ]}
-                        />
+                    <div className="">
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button variant="outline" className=" h-9 justify-start pl-9">
+                                    <Filter className=" h-4 w-4" />
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent>
+                                <DropdownMenuItem onClick={() => setCategory('all')}>All Categories</DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => setCategory('company')}>Company</DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => setCategory('framework')}>Framework</DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => setCategory('product')}>Product</DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => setCategory('tool')}>Tool</DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
                     </div>
-                    <div className="w-full sm:w-[200px]">
+                    <div className="">
                         <div className="relative">
-                            <ArrowUpDown className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground pointer-events-none" />
-                            <select
-                                value={`${sortBy}_${sortOrder}`}
-                                onChange={(e) => {
-                                    const value = e.target.value;
-                                    const parts = value.split('_');
-                                    const newOrder = parts.pop();
-                                    const newSortBy = parts.join('_');
-                                    setSortBy(newSortBy);
-                                    setSortOrder(newOrder);
-                                }}
-                                className="h-9 w-full appearance-none rounded-md border border-border bg-card pl-8 pr-8 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-                            >
-                                <option value="created_at_desc">Newest First</option>
-                                <option value="created_at_asc">Oldest First</option>
-                                <option value="name_asc">Name A-Z</option>
-                                <option value="name_desc">Name Z-A</option>
-                                <option value="copy_count_desc">Most Copied</option>
-                                <option value="copy_count_asc">Least Copied</option>
-                            </select>
-                            <div className="absolute right-3 top-3 h-4 w-4 pointer-events-none opacity-50">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6" /></svg>
-                            </div>
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <Button variant="outline" className="w-full h-9 justify-start pl-8">
+                                        <ArrowUpDown className=" h-4 w-4" />
+                                    </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent>
+                                    <DropdownMenuItem onClick={() => { setSortBy('created_at'); setSortOrder('desc'); }}>Newest First</DropdownMenuItem>
+                                    <DropdownMenuItem onClick={() => { setSortBy('created_at'); setSortOrder('asc'); }}>Oldest First</DropdownMenuItem>
+                                    <DropdownMenuItem onClick={() => { setSortBy('name'); setSortOrder('asc'); }}>Name A-Z</DropdownMenuItem>
+                                    <DropdownMenuItem onClick={() => { setSortBy('name'); setSortOrder('desc'); }}>Name Z-A</DropdownMenuItem>
+                                    <DropdownMenuItem onClick={() => { setSortBy('copy_count'); setSortOrder('desc'); }}>Most Copied</DropdownMenuItem>
+                                    <DropdownMenuItem onClick={() => { setSortBy('copy_count'); setSortOrder('asc'); }}>Least Copied</DropdownMenuItem>
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+                            
                         </div>
                     </div>
                     <div className="flex gap-1">
