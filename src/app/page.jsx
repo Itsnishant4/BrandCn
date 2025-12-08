@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Menu, Search, ArrowRight, Layout, Palette, Zap, Moon,
@@ -14,14 +14,10 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { AnimatedThemeToggler } from "@/components/ui/animated-theme-toggler";
-
-// --- MOCK UI COMPONENTS (Replaces @/components/ui imports) ---
-
+import { Github } from "lucide-react";
 
 const Card = ({ className, children, ...props }) => (
   <motion.div
@@ -35,8 +31,41 @@ const Card = ({ className, children, ...props }) => (
 );
 
 
+const GitHubStats = () => {
+  const [stars, setStars] = useState(null)
 
-// Simplified Accordion for single-file usage
+  useEffect(() => {
+    fetch('https://api.github.com/repos/Itsnishant4/BrandCn')
+      .then(res => res.json())
+      .then(data => {
+        if (data.stargazers_count !== undefined) {
+          setStars(data.stargazers_count)
+        }
+      })
+      .catch(err => console.error('Failed to fetch GitHub stars:', err))
+  }, [])
+
+  return (
+    <Link
+      href="https://github.com/Itsnishant4/BrandCn"
+      target="_blank"
+      rel="noopener noreferrer"
+      className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+    >
+      <Github className="h-4 w-4" />
+      {stars !== null && (
+        <span className="flex items-center gap-1">
+          <Star className="h-3 w-3 fill-current" />
+          {stars.toLocaleString()}
+        </span>
+      )}
+    </Link>
+  )
+}
+
+
+
+
 const Accordion = ({ items }) => {
   const [openIndex, setOpenIndex] = useState(null);
 
@@ -76,7 +105,7 @@ const Accordion = ({ items }) => {
   );
 };
 
-// --- ANIMATION VARIANTS ---
+
 const fadeInUp = {
   initial: { opacity: 0, y: 20 },
   animate: { opacity: 1, y: 0 },
@@ -98,7 +127,7 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen md:w-5xl mx-auto bg-background text-foreground font-sans selection:bg-purple-100">
 
-      {/* --- NOTION-STYLE NAVBAR --- */}
+     
       <header className="sticky top-0 z-50 w-full border-b bg-background/80 backdrop-blur-md h-12 flex items-center px-4 justify-between max-w-5xl mx-auto">
         <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors cursor-pointer">
           <span className="flex items-center justify-center w-5 h-5 rounded hover:bg-muted transition-colors">
@@ -108,9 +137,8 @@ export default function LandingPage() {
           <span className="text-muted-foreground">/</span>
           <span>Home</span>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-4">
           <div className="hidden sm:flex items-center gap-2">
-
             <Button variant="ghost" size="sm" className="h-8 text-xs" onClick={() => router.push(`/themes?search=${encodeURIComponent(search)}`)}>
               <Search className="w-3 h-3" />
             </Button>
@@ -118,12 +146,12 @@ export default function LandingPage() {
           <Button size="sm" className="h-7 text-xs px-3" asChild>
             <Link href="/themes">Get Started</Link>
           </Button>
+            <GitHubStats />
           <AnimatedThemeToggler />
         </div>
 
       </header>
 
-      {/* --- MAIN DOCUMENT CONTAINER --- */}
       <main className="max-w-4xl mx-auto pb-32">
         <motion.div
           className="group relative  h-48 bg-gradient-to-r from-pink-400 via-purple-400 to-indigo-400 opacity-90"
@@ -138,9 +166,9 @@ export default function LandingPage() {
           </div>
         </motion.div>
 
-        {/* --- HEADER CONTENT --- */}
+
         <div className="px-8 md:px-20 relative -mt-10 mb-16">
-          {/* Page Icon */}
+
           <motion.div
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
@@ -150,7 +178,6 @@ export default function LandingPage() {
             😎
           </motion.div>
 
-          {/* Title Section */}
           <div className="mt-1 space-y-6">
             <motion.div
               initial="initial"
@@ -179,7 +206,6 @@ export default function LandingPage() {
               </motion.div>
             </motion.div>
 
-            {/* Introduction Text (Notion Text Block) */}
             <motion.p
               variants={fadeInUp}
               initial="initial" animate="animate"
@@ -198,10 +224,8 @@ export default function LandingPage() {
           </div>
         </div>
 
-        {/* --- CONTENT BLOCKS --- */}
         <div className="px-8 md:px-20 space-y-16">
 
-          {/* BLOCK 1: ACTION BUTTONS */}
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -237,7 +261,6 @@ export default function LandingPage() {
                 </div>
               </div>
               <div className="bg-muted p-8 flex items-center justify-center border-l border-border relative overflow-hidden">
-                {/* Abstract representation of the theme */}
                 <div className="absolute inset-0 bg-grid-black/[0.05] dark:bg-grid-white/[0.05]" />
                 <div className="relative z-10 w-64 h-48 bg-white border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] rounded-md flex flex-col p-4 space-y-2 rotate-2 hover:rotate-0 transition-transform duration-300">
                   <div className="h-4 w-1/3 bg-black/10 rounded" />
@@ -253,7 +276,6 @@ export default function LandingPage() {
             </motion.div>
           </section>
 
-          {/* BLOCK 2: BENTO GRID FEATURES */}
           <section className="space-y-4">
             <div className="flex items-center gap-2 pb-2 border-b border-border">
               <Layout className="w-5 h-5 text-muted-foreground" />
@@ -267,7 +289,6 @@ export default function LandingPage() {
               viewport={{ once: true }}
               className="grid grid-cols-1 md:grid-cols-3 gap-4 auto-rows-[180px]"
             >
-              {/* Card 1: Large */}
               <Card className="md:col-span-2 row-span-2 group bg-card  border-border overflow-hidden relative group">
                 <div className="absolute inset-0 group-hover:bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20" />
                 <CardContent className="px-6 pt-6 flex flex-col h-full justify-between relative z-10">
@@ -280,7 +301,6 @@ export default function LandingPage() {
                       Browse 50+ themes inspired by top-tier products. Visual previews for light and dark modes.
                     </p>
                   </div>
-                  {/* Fake UI preview */}
                   <motion.div
                     whileHover={{ y: -5 }}
                     className="w-full h-38 bg-card rounded-t-xl border shadow-lg translate-y-4 group-hover:translate-y-2 transition-transform p-3 space-y-2"
@@ -296,7 +316,6 @@ export default function LandingPage() {
                 </CardContent>
               </Card>
 
-              {/* Card 2 */}
               <Card className="bg-card border-border hover:bg-muted transition-colors">
                 <CardContent className="p-6 flex flex-col h-full justify-between">
                   <Zap className="w-6 h-6 text-yellow-500 mb-2" />
@@ -308,8 +327,6 @@ export default function LandingPage() {
                   </div>
                 </CardContent>
               </Card>
-
-              {/* Card 3 */}
               <Card className="bg-card border-border hover:bg-muted transition-colors">
                 <CardContent className="p-6 flex flex-col h-full justify-between">
                   <Moon className="w-6 h-6 text-blue-500 mb-2" />
@@ -322,7 +339,6 @@ export default function LandingPage() {
                 </CardContent>
               </Card>
 
-              {/* Card 4: Wide */}
               <Card className="md:col-span-3 bg-gradient-to-r from-card to-muted border-border">
                 <CardContent className="p-6 flex flex-col sm:flex-row items-center justify-between h-full gap-4">
                   <div className="space-y-1">
@@ -375,7 +391,6 @@ export default function LandingPage() {
             </div>
           </section>
 
-          {/* BLOCK 3: HOW IT WORKS (Checklist) */}
           <section className="space-y-4">
             <div className="flex items-center gap-2 pb-2 border-b border-border">
               <CheckCircle2 className="w-5 h-5 text-muted-foreground" />
@@ -433,7 +448,6 @@ export default function LandingPage() {
             </div>
           </section>
 
-          {/* BLOCK 4: TESTIMONIALS (Callouts) */}
           <section className="space-y-4">
             <div className="flex items-center gap-2 pb-2 border-b border-border">
               <Star className="w-5 h-5 text-muted-foreground" />
@@ -465,7 +479,6 @@ export default function LandingPage() {
             </div>
           </section>
 
-          {/* BLOCK 5: FAQ (Toggle List) */}
           <section className="space-y-4 pb-12">
             <div className="flex items-center gap-2 pb-2 border-b border-border">
               <MoreHorizontal className="w-5 h-5 text-muted-foreground" />
@@ -478,7 +491,6 @@ export default function LandingPage() {
         </div>
       </main>
 
-      {/* Footer styled as end of document */}
       <footer className="border-t py-8 mt-12 bg-muted/50">
         <div className="max-w-4xl mx-auto px-8 md:px-20 flex flex-col md:flex-row justify-between items-center text-xs text-muted-foreground">
           <p>Built with ❤️ and Shadcn UI.</p>
@@ -492,7 +504,7 @@ export default function LandingPage() {
   )
 }
 
-// --- Data ---
+
 const TESTIMONIALS = [
   {
     text: "I literally just copied the Linear theme and my app looks 10x better.",

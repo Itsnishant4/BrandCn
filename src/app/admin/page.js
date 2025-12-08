@@ -17,7 +17,6 @@ export default function AdminPage() {
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
-        // Check if already authenticated
         const authStatus = localStorage.getItem('adminAuthenticated')
         if (authStatus === 'true') {
             setIsAuthenticated(true)
@@ -82,7 +81,6 @@ export default function AdminPage() {
         )
     }
 
-    // Password authentication screen
     if (!isAuthenticated) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-muted/10">
@@ -134,7 +132,6 @@ export default function AdminPage() {
         )
     }
 
-    // Admin dashboard content
     return (
         <div className="min-h-screen bg-muted/10 p-6">
             <div className="max-w-7xl mx-auto">

@@ -2,15 +2,15 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { Input } from "@/components/ui/input"
-import { Copy, Eye, Search, Filter, Menu, Check, Grid, List, Loader2 } from 'lucide-react'
+import { Copy, Eye, Search, Filter, Menu, Check, Grid, List, Loader2, ArrowUpDown } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from "@/components/ui/skeleton"
-import { AnimatePresence, motion } from 'framer-motion'
+import { motion } from 'framer-motion'
 import Image from 'next/image'
-import { AnimatedThemeToggler } from '@/components/ui/animated-theme-toggler'
+import Header from '@/components/Header'
 
 const CustomSelect = ({ value, onChange, options }) => (
     <div className="relative">
@@ -40,14 +40,18 @@ export default function ThemesPage() {
     const [currentPage, setCurrentPage] = useState(1)
     const [search, setSearch] = useState('')
     const [category, setCategory] = useState('all')
+    const [sortBy, setSortBy] = useState('created_at')
+    const [sortOrder, setSortOrder] = useState('desc')
     const [copiedId, setCopiedId] = useState(null);
     const [viewMode, setViewMode] = useState('gallery');
 
-    const fetchThemes = async (page = 1, append = false) => {
+    const fetchThemes = async (page = 1, append = false, sortByParam = sortBy, orderParam = sortOrder) => {
         try {
             const url = new URL('/api/themes', window.location.origin)
             url.searchParams.set('page', page.toString())
             url.searchParams.set('limit', '12')
+            if (sortByParam) url.searchParams.set('sortBy', sortByParam)
+            if (orderParam) url.searchParams.set('order', orderParam)
 
             const res = await fetch(url)
             const data = await res.json()
@@ -76,24 +80,23 @@ export default function ThemesPage() {
     useEffect(() => {
         const handleFilters = async () => {
             if (search !== '' || category !== 'all') {
-                // When filtering, get all themes for proper client-side filtering
                 try {
                     const res = await fetch('/api/themes?page=1&limit=1000')
                     const data = await res.json()
                     if (data.themes && Array.isArray(data.themes)) {
                         setThemes(data.themes)
-                        setHasNextPage(false) // Disable infinite scroll during filtering
+                        setHasNextPage(false) 
                     }
                 } catch (error) {
                     console.error('Error fetching filtered themes:', error)
                 }
             } else {
-                // Reset to normal pagination when filters are cleared
+       
                 if (themes.length > 12) {
                     setLoading(true)
                     try {
                         await fetchThemes(1, false)
-                        setTimeout(() => setHasNextPage(true), 100) // Re-enable infinite scroll
+                        setTimeout(() => setHasNextPage(true), 100) 
                     } finally {
                         setLoading(false)
                     }
@@ -103,6 +106,21 @@ export default function ThemesPage() {
 
         handleFilters()
     }, [search, category])
+
+    useEffect(() => {
+        const handleSortingChange = async () => {
+            setLoading(true)
+            try {
+                await fetchThemes(1, false, sortBy, sortOrder)
+            } finally {
+                setLoading(false)
+            }
+        }
+
+        if (search === '' && category === 'all') {
+            handleSortingChange()
+        }
+    }, [sortBy, sortOrder])
 
     const filteredThemes = themes.filter(theme => {
         const matchesSearch = theme.name.toLowerCase().includes(search.toLowerCase())
@@ -117,25 +135,42 @@ export default function ThemesPage() {
             }
         }
     };
-    // Load more themes function
     const loadMoreThemes = useCallback(async () => {
         if (!hasNextPage || loadingMore) return
 
         setLoadingMore(true)
         try {
-            await fetchThemes(currentPage + 1, true)
+            await fetchThemes(currentPage + 1, true, sortBy, sortOrder)
         } finally {
             setLoadingMore(false)
         }
-    }, [hasNextPage, loadingMore, currentPage, fetchThemes])
+    }, [hasNextPage, loadingMore, currentPage, fetchThemes, sortBy, sortOrder])
 
-    const handleCopy = (code, id) => {
-        navigator.clipboard.writeText(code);
+    const handleCopy = async (code, id) => {
         setCopiedId(id);
+        setTimeout(() => setCopiedId(null), 2000);
+        try {
+            await navigator.clipboard.writeText(code);
 
+            const response = await fetch('/api/themes', {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id, action: 'increment_copy' })
+            });
+
+            if (response.ok) {
+                setThemes(prev => prev.map(theme =>
+                    theme.id === id
+                        ? { ...theme, copy_count: (theme.copy_count || 0) + 1 }
+                        : theme
+                ));
+            }
+
+        } catch (error) {
+            console.error('Error copying theme:', error);
+        }
     }
 
-    // Intersection Observer for infinite scroll
     const observerRef = useRef()
     const lastElementRef = useCallback((node) => {
         if (loadingMore) return
@@ -152,20 +187,7 @@ export default function ThemesPage() {
 
     return (
         <div className="min-h-screen md:w-5xl mx-auto  item-center flex flex-col bg-background">
-            {/* Header Area */}
-            <header className="sticky top-0 z-50 w-full border-b bg-background/80 backdrop-blur-md h-12 flex items-center px-4 justify-between max-w-5xl mx-auto">
-                <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors cursor-pointer">
-                    <span className="flex items-center justify-center w-5 h-5 rounded hover:bg-muted transition-colors">
-                        <Menu className="w-4 h-4" />
-                    </span>
-                    <Link href={"/"}>
-                        <span className="text-foreground">BrandCn</span>
-                    </Link>
-                    <span className="text-muted-foreground">/</span>
-                    <span>Gallery</span>
-                </div>
-                <AnimatedThemeToggler />
-            </header>
+            <Header title="Gallery" />
             <motion.div
                 className="relative flex justify-center items-center max-w-4xl mx-auto  w-full h-48  bg-linear-to-r from-pink-400 via-purple-400 to-indigo-400 overflow-hidden"
                 animate={{ backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"] }}
@@ -213,6 +235,33 @@ export default function ThemesPage() {
                             ]}
                         />
                     </div>
+                    <div className="w-full sm:w-[200px]">
+                        <div className="relative">
+                            <ArrowUpDown className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground pointer-events-none" />
+                            <select
+                                value={`${sortBy}_${sortOrder}`}
+                                onChange={(e) => {
+                                    const value = e.target.value;
+                                    const parts = value.split('_');
+                                    const newOrder = parts.pop();
+                                    const newSortBy = parts.join('_');
+                                    setSortBy(newSortBy);
+                                    setSortOrder(newOrder);
+                                }}
+                                className="h-9 w-full appearance-none rounded-md border border-border bg-card pl-8 pr-8 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                            >
+                                <option value="created_at_desc">Newest First</option>
+                                <option value="created_at_asc">Oldest First</option>
+                                <option value="name_asc">Name A-Z</option>
+                                <option value="name_desc">Name Z-A</option>
+                                <option value="copy_count_desc">Most Copied</option>
+                                <option value="copy_count_asc">Least Copied</option>
+                            </select>
+                            <div className="absolute right-3 top-3 h-4 w-4 pointer-events-none opacity-50">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6" /></svg>
+                            </div>
+                        </div>
+                    </div>
                     <div className="flex gap-1">
                         <Button
                             variant={viewMode === 'gallery' ? 'default' : 'outline'}
@@ -234,7 +283,6 @@ export default function ThemesPage() {
                 </motion.div>
             </div>
 
-            {/* Themes Area */}
             <div className="px-6 max-w-4xl w-full mx-auto py-12">
                 {loading ? (
                     viewMode === 'gallery' ? (
@@ -274,7 +322,6 @@ export default function ThemesPage() {
                             viewMode === 'gallery' ? (
                                 <motion.div key={theme.id} layout>
                                     <Card className="group flex flex-col h-full hover:shadow-lg transition-shadow duration-300 border-border">
-                                        {/* Card Preview Area */}
                                         <div className="relative h-40 bg-linear-to-br from-muted to-accent p-6 flex items-center justify-center group-hover:from-purple-50 group-hover:to-indigo-50 transition-colors duration-500">
                                             <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10" />
                                             <Image
@@ -289,7 +336,6 @@ export default function ThemesPage() {
                                             </Badge>
                                         </div>
 
-                                        {/* Card Content */}
                                         <div className="pb-5 px-5 flex flex-col grow">
                                             <div className="flex items-center justify-between mb-4">
                                                 <h3 className="font-semibold text-foreground">{theme.name}</h3>
@@ -307,11 +353,16 @@ export default function ThemesPage() {
                                                     onClick={() => handleCopy(theme.code, theme.id)}
                                                 >
                                                     {copiedId === theme.id ? (
-                                                        <Check className="mr-2 h-3.5 w-3.5 text-green-600" />
+                                                        <>
+                                                            <Check className="mr-2 h-3.5 w-3.5 text-green-600" />
+                                                            Copied
+                                                        </>
                                                     ) : (
-                                                        <Copy className="mr-2 h-3.5 w-3.5" />
+                                                        <>
+                                                            <Copy className="mr-2 h-3.5 w-3.5" />
+                                                            {theme.copy_count || 0}
+                                                        </>
                                                     )}
-                                                    {copiedId === theme.id ? "Copied" : "Copy"}
                                                 </Button>
                                                 <Button size="sm" className="flex-1" asChild>
                                                     <Link href={`/themes/${theme.slug}`}>
@@ -401,7 +452,6 @@ export default function ThemesPage() {
                             )
                         )}
 
-                        {/* Infinite Scroll Sentinel */}
 
                     </motion.div>
                 )}
@@ -414,7 +464,6 @@ export default function ThemesPage() {
                     </div>
                 )}
 
-                {/* Load More Button for when infinite scroll doesn't work or for filtered results */}
                 {hasNextPage && search === '' && category === 'all' && !loading && (
                     <div className="flex justify-center mx-auto py-8 pt-4">
                         <Button

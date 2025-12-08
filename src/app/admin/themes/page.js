@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { useRouter } from 'next/navigation'
 import { Button } from "@/components/ui/button"
@@ -8,13 +9,13 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
-import { ThemePreview } from "@/components/theme-preview" // Ensure this exists or mock it
+import { ThemePreview } from "@/components/theme-preview" 
 import { ArrowLeft, Loader2, Save, Sparkles } from 'lucide-react'
 import Link from 'next/link'
 import { Badge } from '@/components/ui/badge'
 import Image from 'next/image'
 
-export default function AdminThemesPage() {
+function AdminThemesPage() {
     const router = useRouter()
     const searchParams = useSearchParams()
     const editSlug = searchParams.get('edit')
@@ -48,7 +49,6 @@ export default function AdminThemesPage() {
     })
 
     useEffect(() => {
-        // Check if already authenticated
         const authStatus = localStorage.getItem('adminAuthenticated')
         if (authStatus === 'true') {
             setIsAuthenticated(true)
@@ -115,7 +115,7 @@ export default function AdminThemesPage() {
   /* Dark mode overrides */
 }`
                 })
-                // Optional: redirect or clear form
+                
             } else {
                 alert(`Error ${isEditing ? 'updating' : 'adding'} theme`)
             }
@@ -329,23 +329,22 @@ IMPORTANT: You must ONLY modify the HEX color values (# followed by 6 characters
         }
     }
 
-    // Auto-generate slug from name
+   
     useEffect(() => {
         if (formData.name) {
             const slug = formData.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
-            if (!formData.slug || formData.slug.includes('-')) { // Simple check to avoid overwriting custom slugs too aggressively
+            if (!formData.slug || formData.slug.includes('-')) { 
                 setFormData(prev => ({ ...prev, slug }))
             }
         }
     }, [formData.name])
 
     if (!isAuthenticated) {
-        return null // Redirect is handled in useEffect
+        return null 
     }
 
     return (
         <div className="h-screen flex flex-col bg-muted/10">
-            {/* Admin Header */}
             <div className="border-b bg-background px-6 py-3 flex items-center justify-between">
                 <div className="flex items-center gap-4">
                     <Button variant="ghost" size="icon" asChild>
@@ -360,7 +359,7 @@ IMPORTANT: You must ONLY modify the HEX color values (# followed by 6 characters
             </div>
 
             <div className="flex-1 flex flex-col md:flex-row ">
-                {/* Left: Settings Panel */}
+         
                 <div className="w-full md:w-1/3 md:min-w-[400px] border-r bg-background overflow-y-auto p-6 space-y-6">
                     <div className="space-y-4">
                         <div>
@@ -464,18 +463,26 @@ IMPORTANT: You must ONLY modify the HEX color values (# followed by 6 characters
                     </div>
                 </div>
 
-                {/* Right: Live Preview */}
+       
                 <div className="flex-1 bg-muted/30 p-8 overflow-y-auto">
                     <div className="max-w-4xl mx-auto space-y-4">
                         <div className="flex items-center justify-between">
                             <h2 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Live Preview</h2>
                             <Badge variant="outline">Auto-updates</Badge>
                         </div>
-                        {/* We pass the code from the form directly to the preview */}
+                   
                         <ThemePreview code={formData.code} />
                     </div>
                 </div>
             </div>
         </div>
+    )
+}
+
+export default function Wrapper() {
+    return (
+        <Suspense fallback={<div className="h-screen flex items-center justify-center"><div className="text-lg">Loading...</div></div>}>
+            <AdminThemesPage />
+        </Suspense>
     )
 }
