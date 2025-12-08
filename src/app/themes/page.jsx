@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useRef, useCallback, Suspense } from 'react'
+import { useSearchParams, useRouter } from 'next/navigation'
 import { Input } from "@/components/ui/input"
 import { Copy, Eye, Search, Filter, Menu, Check, Grid, List, Loader2, ArrowUpDown } from 'lucide-react'
 import Link from 'next/link'
@@ -15,7 +16,9 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 
 
 
-export default function ThemesPage() {
+function ThemesContent() {
+    const searchParams = useSearchParams();
+    const router = useRouter();
     const [themes, setThemes] = useState([])
     const [loading, setLoading] = useState(true)
     const [loadingMore, setLoadingMore] = useState(false)
@@ -27,6 +30,41 @@ export default function ThemesPage() {
     const [sortOrder, setSortOrder] = useState('desc')
     const [copiedId, setCopiedId] = useState(null);
     const [viewMode, setViewMode] = useState('gallery');
+
+    // Initialize search from URL parameters
+    useEffect(() => {
+        const qParam = searchParams.get('q') || '';
+        setSearch(qParam);
+    }, [searchParams]);
+
+    // Update URL when search changes
+    const updateSearchURL = useCallback((searchTerm) => {
+        const params = new URLSearchParams(searchParams);
+        if (searchTerm) {
+            params.set('q', searchTerm);
+        } else {
+            params.delete('q');
+        }
+        router.replace(`/themes?${params.toString()}`, { scroll: false });
+    }, [router, searchParams]);
+
+    // Handle search input change and URL update
+    const handleSearchChange = (e) => {
+        const value = e.target.value;
+        setSearch(value);
+        // Debounce URL update for better UX
+        const timeoutId = setTimeout(() => {
+            updateSearchURL(value);
+        }, 300);
+        return () => clearTimeout(timeoutId);
+    };
+
+    // Handle Enter key press for immediate search
+    const handleSearchKeyDown = (e) => {
+        if (e.key === 'Enter') {
+            updateSearchURL(search);
+        }
+    };
 
     const fetchThemes = async (page = 1, append = false, sortByParam = sortBy, orderParam = sortOrder) => {
         try {
@@ -201,7 +239,8 @@ export default function ThemesPage() {
                         <Input
                             placeholder="Search themes..."
                             value={search}
-                            onChange={(e) => setSearch(e.target.value)}
+                            onChange={handleSearchChange}
+                            onKeyDown={handleSearchKeyDown}
                             className="pl-9 border-border bg-muted focus:bg-card transition-all"
                         />
                     </div>
@@ -413,7 +452,7 @@ export default function ThemesPage() {
                                         <Search className="w-8 h-8 text-muted-foreground" />
                                     </div>
                                     <p className="text-muted-foreground text-lg">No themes found matching your criteria.</p>
-                                    <Button variant="link" onClick={() => { setSearch(''); setCategory('all') }} className="text-purple-600">
+                                    <Button variant="link" onClick={() => { setSearch(''); setCategory('all'); updateSearchURL('') }} className="text-purple-600">
                                         Clear filters
                                     </Button>
                                 </motion.div>
@@ -427,7 +466,7 @@ export default function ThemesPage() {
                                         <Search className="w-8 h-8 text-muted-foreground" />
                                     </div>
                                     <p className="text-muted-foreground text-lg">No themes found matching your criteria.</p>
-                                    <Button variant="link" onClick={() => { setSearch(''); setCategory('all') }} className="text-purple-600">
+                                    <Button variant="link" onClick={() => { setSearch(''); setCategory('all'); updateSearchURL('') }} className="text-purple-600">
                                         Clear filters
                                     </Button>
                                 </motion.div>
@@ -467,5 +506,47 @@ export default function ThemesPage() {
                 )}
             </div>
         </div>
+    )
+}
+
+function LoadingFallback() {
+    return (
+        <div className="min-h-screen md:w-5xl mx-auto item-center flex flex-col bg-background">
+            <div className="relative flex justify-center items-center max-w-4xl mx-auto w-full h-48 bg-linear-to-r from-pink-400 via-purple-400 to-indigo-400 overflow-hidden">
+                <div className="absolute inset-0 bg-white/10 backdrop-blur-[1px]" />
+                <div className="relative z-10 px-6 md:px-20 text-center py-5">
+                    <h1 className="text-3xl md:text-5xl text-white font-bold tracking-tight mb-4 drop-shadow-md">
+                        Explore the Gallery
+                    </h1>
+                </div>
+            </div>
+            <div className="px-6 md:px-44 -mt-8 relative z-20">
+                <div className="bg-card rounded-xl border border-border shadow-xl p-4 flex flex-col sm:flex-row gap-4 items-center">
+                    <div className="flex-1 w-full h-9 bg-muted rounded"></div>
+                </div>
+            </div>
+            <div className="px-6 max-w-4xl w-full mx-auto py-12">
+                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                    {[1, 2, 3, 4, 5, 6].map(i => (
+                        <div key={i} className="space-y-3">
+                            <div className="h-[180px] w-full bg-muted rounded-xl"></div>
+                            <div className="flex justify-between">
+                                <div className="h-4 w-1/3 bg-muted rounded"></div>
+                                <div className="h-4 w-1/4 bg-muted rounded"></div>
+                            </div>
+                            <div className="h-8 w-full bg-muted rounded"></div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        </div>
+    )
+}
+
+export default function ThemesPage() {
+    return (
+        <Suspense fallback={<LoadingFallback />}>
+            <ThemesContent />
+        </Suspense>
     )
 }

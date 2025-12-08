@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+
+# Allow all crawlers to access the site
+# No restrictions for this theme library
+
+# Sitemap
+Sitemap: https://brand-cn.vercel.app/sitemap.xml

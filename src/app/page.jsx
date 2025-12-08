@@ -495,8 +495,8 @@ export default function LandingPage() {
         <div className="max-w-4xl mx-auto px-8 md:px-20 flex flex-col md:flex-row justify-between items-center text-xs text-muted-foreground">
           <p>Built with ❤️ and Shadcn UI.</p>
           <div className="flex gap-4 mt-2 md:mt-0">
-            <a href="#" className="hover:underline hover:text-foreground">Twitter</a>
-            <a href="#" className="hover:underline hover:text-foreground">GitHub</a>
+            <a href="https://x.com/NishantPat78737" className="hover:underline hover:text-foreground">Twitter</a>
+            <a href="https://github.com/Itsnishant4" className="hover:underline hover:text-foreground">GitHub</a>
           </div>
         </div>
       </footer>
