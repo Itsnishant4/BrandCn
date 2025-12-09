@@ -26,7 +26,7 @@ function ThemesContent() {
     const [currentPage, setCurrentPage] = useState(1)
     const [search, setSearch] = useState('')
     const [category, setCategory] = useState('all')
-    const [sortBy, setSortBy] = useState('created_at')
+    const [sortBy, setSortBy] = useState('copy_count')
     const [sortOrder, setSortOrder] = useState('desc')
     const [copiedId, setCopiedId] = useState(null);
     const [viewMode, setViewMode] = useState('gallery');
