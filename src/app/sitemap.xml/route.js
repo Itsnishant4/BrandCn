@@ -33,6 +33,12 @@ export async function GET() {
     '/use-cases',
     '/compare',
     '/about',
+    '/contact',
+    '/docs',
+    '/docs/getting-started',
+    '/docs/customizing',
+    '/docs/dark-mode',
+    '/docs/shadcn-integration',
     '/privacy',
     '/terms',
     '/license'
