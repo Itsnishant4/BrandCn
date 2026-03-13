@@ -1,221 +1,94 @@
-"use client";
-import React, { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import {
-    ChevronLeft, Copy, Check, LayoutDashboard,
-    Settings, Users, BarChart3, Bell, Search,
-    Plus, Calendar, Sun, Moon, Heart, Eye, Download
-} from "lucide-react";
-import { useParams } from "next/navigation";
-import Image from "next/image";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import Link from "next/link";
-import { ThemePreview } from "@/components/theme-preview";
+import { notFound } from 'next/navigation';
+import ThemeDetailClient from './theme-detail-client';
 
-
-
-
-
-const fadeInUp = {
-    initial: { opacity: 0, y: 20 },
-    animate: { opacity: 1, y: 0 },
-    transition: { duration: 0.5, ease: "easeOut" }
-};
-
-export default function ThemeDetailPage() {
-
-    const { slug } = useParams()
-    const [theme, setTheme] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [copied, setCopied] = useState(false);
-    const [liked, setLiked] = useState(false);
-    const [copyCount, setCopyCount] = useState(0);
-
-    useEffect(() => {
-        const loadThemeData = async () => {
-            const likedThemes = JSON.parse(localStorage.getItem('likedThemes') || '[]');
-            setLiked(likedThemes.includes(slug));
-
-            if (slug) {
-                try {
-                    const res = await fetch(`/api/themes/${slug}`);
-                    const data = await res.json();
-                    setTheme(data);
-                    setCopyCount(data.copy_count || 0);
-                } catch (error) {
-                    console.error('Error loading theme:', error);
-                } finally {
-                    setLoading(false);
-                }
-            }
-        };
-
-        loadThemeData();
-    }, [slug])
-
-    const handleLike = () => {
-        const likedThemes = JSON.parse(localStorage.getItem('likedThemes') || '[]');
-        let newLikedThemes;
-
-        if (liked) {
-            newLikedThemes = likedThemes.filter(s => s !== slug);
-            setLiked(false);
-        } else {
-            newLikedThemes = [...likedThemes, slug];
-            setLiked(true);
-        }
-
-        localStorage.setItem('likedThemes', JSON.stringify(newLikedThemes));
+export async function generateMetadata({ params }) {
+  const { slug } = await params;
+  
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'https://brand-cn.vercel.app'}/api/themes/${slug}`, {
+      next: { revalidate: 60 }
+    });
+    
+    if (!res.ok) {
+      return {
+        title: 'Theme Not Found - BrandCn',
+      };
+    }
+    
+    const theme = await res.json();
+    
+    return {
+      title: `${theme.name} - Theme by BrandCn`,
+      description: theme.description || `Get the ${theme.name} theme for shadcn/ui and Tailwind CSS. ${theme.category} theme with dark mode support.`,
+      openGraph: {
+        title: `${theme.name} - BrandCn Theme`,
+        description: theme.description || `Get the ${theme.name} theme for shadcn/ui and Tailwind CSS`,
+        url: `https://brand-cn.vercel.app/themes/${slug}`,
+        siteName: 'BrandCn',
+        images: [
+          {
+            url: theme.icon_url || 'https://brand-cn.vercel.app/og-image.png',
+            width: 1200,
+            height: 630,
+            alt: `${theme.name} theme preview`,
+          },
+        ],
+        locale: 'en_US',
+        type: 'website',
+      },
+      twitter: {
+        card: 'summary_large_image',
+        title: `${theme.name} - BrandCn Theme`,
+        description: theme.description || `Get the ${theme.name} theme for shadcn/ui and Tailwind CSS`,
+        images: [theme.icon_url || 'https://brand-cn.vercel.app/og-image.png'],
+        creator: '@NishantPat78737',
+      },
+      alternates: {
+        canonical: `https://brand-cn.vercel.app/themes/${slug}`,
+      },
+      robots: {
+        index: true,
+        follow: true,
+      },
     };
-
-    const handleCopy = async () => {
-        if (!theme) return;
-        setCopied(true);
-        setTimeout(() => setCopied(false), 2000);
-        try {
-            await navigator.clipboard.writeText(theme.code);
-
-            const response = await fetch('/api/themes', {
-                method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ id: theme.id, action: 'increment_copy' })
-            });
-
-            if (response.ok) {
-                const data = await response.json();
-                setCopyCount(data.copy_count);
-            }
-
-        } catch (error) {
-            console.error('Error copying theme:', error);
-        }
+  } catch (error) {
+    return {
+      title: 'BrandCn - Theme Library',
     };
+  }
+}
 
-    if (loading) return (
-        <div className="h-screen w-full flex flex-col items-center justify-center bg-background gap-3">
-            <div className="w-8 h-8 border-2 border-border border-t-foreground rounded-full animate-spin" />
-            <p className="text-muted-foreground text-sm animate-pulse">Loading Theme...</p>
-        </div>
-    );
-
-    if (!theme) return <div className="h-screen flex items-center justify-center">Theme not found</div>;
-
-    return (
-        <div className="min-h-screen md:w-5xl w-full mx-auto bg-background text-foreground font-sans selection:bg-purple-100">
-
-            <div className="sticky top-0 z-50 md:w-5xl border-b bg-background/80 backdrop-blur-md">
-                <div className="max-w-5xl mx-auto h-16 flex items-center justify-between ">
-                    <div className="flex items-center gap-4">
-                        <Button variant="ghost" size="icon" asChild className="rounded-full text-muted-foreground hover:text-foreground">
-                            <Link href="/themes"><ChevronLeft className="w-5 h-5" /></Link>
-                        </Button>
-                        <div className="flex items-center gap-3">
-                            {theme.iconUrl && <img src={theme.iconUrl} alt={theme.name} className="h-6 w-6 object-contain" />}
-                            <h2 className=" text-lg text-foreground">{theme.name}</h2>
-                            <Badge variant="secondary" className="hidden sm:inline-flex bg-muted text-muted-foreground">{theme.category}</Badge>
-                        </div>
-                    </div>
-                    <Button onClick={handleCopy} className={copied ? "bg-green-600 hover:bg-green-700 text-white " : "mr-2!"}>
-                        {copied ? <Check className="mr-2 h-4 w-4" /> : <Copy className="mr-2 h-4 w-4" />}
-                        {copied ? "Copied!" : "Copy CSS"}
-                    </Button>
-                </div>
-            </div>
-
-     
-            <main className="max-w-5xl mx-auto pb-20">
-
-         
-                <motion.div
-                    className="relative w-full h-48 md:h-64 bg-gradient-to-r from-pink-400 via-purple-400 to-indigo-400 overflow-hidden"
-                    animate={{ backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"] }}
-                    transition={{ duration: 15, ease: "linear", repeat: Infinity }}
-                    style={{ backgroundSize: "400% 400%" }}
-                >
-                    <div className="absolute inset-0 bg-white/10 backdrop-blur-[1px]" />
-                    <div className="absolute bottom-0 left-0 w-full h-24 bg-gradient-to-t from-white to-transparent" />
-                </motion.div>
-
-                <div className="px-6 md:px-8 -mt-20 relative z-10 space-y-12">
-
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="space-y-4"
-                    >
-                        <div className="w-24 h-24 rounded-2xl bg-card p-4 shadow-xl flex items-center justify-center mb-6">
-                            <Image src={theme.icon_url} width={100} height={100} className="w-full h-full object-contain" alt="Icon" />
-                        </div>
-                        <div className="flex items-start justify-between">
-                            <div className="flex-1">
-                                <h1 className="text-4xl font-semibold text-foreground mb-2">{theme.name}</h1>
-                                <p className="text-lg text-muted-foreground max-w-2xl leading-relaxed">{theme.description}</p>
-                            </div>
-                            <div className="flex items-center gap-4 ml-8">
-                                <Button
-                                    variant="outline"
-                                    onClick={handleLike}
-                                    className={`flex items-center gap-2 transition-colors ${liked ? 'text-red-500 border-red-200 hover:bg-red-50' : 'text-muted-foreground hover:text-red-500'}`}
-                                >
-                                    <Heart className={`w-4 h-4 ${liked ? 'fill-current' : ''}`} />
-                                    <span className="text-sm">{liked ? 'Liked' : 'Like'}</span>
-                                </Button>
-                            </div>
-                        </div>
-
-                        <div className="flex items-center gap-6 text-sm text-muted-foreground">
-                            <div className="flex items-center gap-2">
-                                <Eye className="w-4 h-4" />
-                                <span>{copyCount} copies</span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                                <Heart className={`w-4 h-4 ${liked ? 'fill-red-500 text-red-500' : ''}`} />
-                                <span>{liked ? 'Liked' : 'Not liked'}</span>
-                            </div>
-                        </div>
-                    </motion.div>
-
-                    <motion.div
-                        variants={fadeInUp}
-                        initial="initial" animate="animate"
-                        className="space-y-4"
-                    >
-                        <div className="flex items-center justify-between border-b border-border pb-2">
-                            <h2 className="text-xl font-semibold  text-foreground">Component Preview</h2>
-                            <span className="text-xs text-muted-foreground font-mono">dashboard.tsx</span>
-                        </div>
-                        <div className="rounded-xl border border-border bg-card p-2 shadow-sm">
-                            <ThemePreview code={theme.code} />
-                        </div>
-                    </motion.div>
-
-                    <motion.div
-                        variants={fadeInUp}
-                        initial="initial" animate="animate"
-                        transition={{ delay: 0.1 }}
-                        className="space-y-4"
-                    >
-                        <div className="flex items-center justify-between border-b border-border pb-2">
-                            <h2 className="text-xl  text-foreground">CSS Variables</h2>
-                            <span className="text-xs text-muted-foreground font-mono">globals.css</span>
-                        </div>
-
-                        <div className="relative rounded-xl border border-border bg-muted p-1 group">
-                            <div className="absolute top-4 right-4 z-10 opacity-0 group-hover:opacity-100 transition-opacity">
-                                <Button variant="secondary" size="sm" onClick={handleCopy} className="bg-card shadow-sm border border-border text-foreground">
-                                    <Copy className="w-3.5 h-3.5 mr-2" /> Copy
-                                </Button>
-                            </div>
-                            <div className="max-h-[500px] overflow-y-auto rounded-lg bg-card border border-border p-6 scrollbar-thin scrollbar-thumb-muted-foreground scrollbar-track-transparent">
-                                <pre className="text-xs sm:text-sm font-mono leading-relaxed text-muted-foreground">
-                                    <code>{theme.code}</code>
-                                </pre>
-                            </div>
-                        </div>
-                    </motion.div>
-                </div>
-            </main>
-        </div>
-    );
+export default async function ThemeDetailPage({ params }) {
+  const { slug } = await params;
+  
+  let theme = null;
+  let relatedThemes = [];
+  
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'https://brand-cn.vercel.app'}/api/themes/${slug}`, {
+      next: { revalidate: 60 }
+    });
+    
+    if (res.ok) {
+      theme = await res.json();
+      
+      const relatedRes = await fetch(
+        `${process.env.NEXT_PUBLIC_APP_URL || 'https://brand-cn.vercel.app'}/api/themes?category=${theme.category}&limit=4`,
+        { next: { revalidate: 60 } }
+      );
+      
+      if (relatedRes.ok) {
+        const relatedData = await relatedRes.json();
+        relatedThemes = (relatedData.themes || []).filter(t => t.slug !== slug).slice(0, 3);
+      }
+    }
+  } catch (e) {
+    console.error('Error loading theme:', e);
+  }
+  
+  if (!theme) {
+    notFound();
+  }
+  
+  return <ThemeDetailClient theme={{ ...theme, relatedThemes }} />;
 }

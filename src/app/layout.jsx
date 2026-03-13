@@ -58,7 +58,6 @@ export const metadata = {
     ],
     locale: "en_US",
     type: "website",
-    type: "website",
   },
   twitter: {
     card: "summary_large_image",
@@ -106,18 +105,120 @@ export default function RootLayout({ children }) {
           dangerouslySetInnerHTML={{
             __html: JSON.stringify({
               "@context": "https://schema.org",
+              "@type": "WebSite",
+              "url": "https://brand-cn.vercel.app",
+              "description": "The Ultimate Theme Library for shadcn/ui & Tailwind CSS",
+              "potentialAction": {
+                "@type": "SearchAction",
+                "target": {
+                  "@type": "EntryPoint",
+                  "urlTemplate": "https://brand-cn.vercel.app/themes?q={search_term_string}"
+                },
+                "query-input": "required name=search_term_string"
+              }
+            })
+          }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
               "@type": "Organization",
               "name": "BrandCn",
               "url": "https://brand-cn.vercel.app",
-              "logo": "https://brand-cn.vercel.app/favicon.ico",
+              "logo": "https://brand-cn.vercel.app/android-chrome-512x512.png",
               "description": "The Ultimate Theme Library for shadcn/ui & Tailwind CSS. A curated collection of accessible, dark-mode ready themes.",
-              "founder": {
-                "@type": "Person",
-                "name": "BrandCn"
-              },
               "sameAs": [
                 "https://github.com/Itsnishant4/BrandCn",
-                "https://github.com/Itsnishant4"
+                "https://x.com/NishantPat78737"
+              ],
+              "contactPoint": {
+                "@type": "ContactPoint",
+                "contactType": "customer service",
+                "url": "https://brand-cn.vercel.app"
+              }
+            })
+          }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "BreadcrumbList",
+              "itemListElement": [
+                {
+                  "@type": "ListItem",
+                  "position": 1,
+                  "name": "Home",
+                  "item": "https://brand-cn.vercel.app/"
+                },
+                {
+                  "@type": "ListItem",
+                  "position": 2,
+                  "name": "Themes",
+                  "item": "https://brand-cn.vercel.app/themes"
+                }
+              ]
+            })
+          }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "FAQPage",
+              "mainEntity": [
+                {
+                  "@type": "Question",
+                  "name": "Is this free to use?",
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Yes, totally free and open source. Use it in personal or commercial projects."
+                  }
+                },
+                {
+                  "@type": "Question",
+                  "name": "Does it work with Tailwind v4?",
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Yes, all themes use simple CSS variables, so they work fine with Tailwind v4's new engine."
+                  }
+                },
+                {
+                  "@type": "Question",
+                  "name": "How do I use a theme?",
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Just open the theme file, copy the variables, and paste inside your main CSS file."
+                  }
+                },
+                {
+                  "@type": "Question",
+                  "name": "Do I need to install any npm package?",
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "No! Zero installation. Just copy and paste the code."
+                  }
+                },
+                {
+                  "@type": "Question",
+                  "name": "Will you add more brand themes?",
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Yes! We're constantly adding more themes. You can also contribute if you want."
+                  }
+                },
+                {
+                  "@type": "Question",
+                  "name": "Can I use this in my client projects?",
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Absolutely! Just follow the open-source license rules if you modify the repo."
+                  }
+                }
               ]
             })
           }}
@@ -151,26 +252,6 @@ export default function RootLayout({ children }) {
                 "price": "0",
                 "priceCurrency": "USD",
                 "availability": "https://schema.org/InStock"
-              }
-            })
-          }}
-        />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "WebSite",
-              "name": "BrandCn",
-              "url": "https://brand-cn.vercel.app",
-              "description": "The Ultimate Theme Library for shadcn/ui & Tailwind CSS",
-              "potentialAction": {
-                "@type": "SearchAction",
-                "target": {
-                  "@type": "EntryPoint",
-                  "urlTemplate": "https://brand-cn.vercel.app/themes?q={search_term_string}"
-                },
-                "query-input": "required name=search_term_string"
               }
             })
           }}

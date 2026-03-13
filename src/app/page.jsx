@@ -491,12 +491,51 @@ export default function LandingPage() {
         </div>
       </main>
 
-      <footer className="border-t py-8 mt-12 bg-muted/50">
-        <div className="max-w-4xl mx-auto px-8 md:px-20 flex flex-col md:flex-row justify-between items-center text-xs text-muted-foreground">
-          <p>Built with ❤️ and Shadcn UI.</p>
-          <div className="flex gap-4 mt-2 md:mt-0">
-            <a href="https://x.com/NishantPat78737" className="hover:underline hover:text-foreground">Twitter</a>
-            <a href="https://github.com/Itsnishant4" className="hover:underline hover:text-foreground">GitHub</a>
+      <footer className="border-t py-12 mt-12 bg-muted/50">
+        <div className="max-w-5xl mx-auto px-8 md:px-20">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-8">
+            <div>
+              <h3 className="font-semibold text-foreground mb-4">Themes</h3>
+              <ul className="space-y-2 text-sm text-muted-foreground">
+                <li><Link href="/themes" className="hover:text-foreground transition-colors">Browse All</Link></li>
+                <li><Link href="/themes?category=company" className="hover:text-foreground transition-colors">Company</Link></li>
+                <li><Link href="/themes?category=framework" className="hover:text-foreground transition-colors">Framework</Link></li>
+                <li><Link href="/themes?category=product" className="hover:text-foreground transition-colors">Product</Link></li>
+                <li><Link href="/themes?category=tool" className="hover:text-foreground transition-colors">Tools</Link></li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="font-semibold text-foreground mb-4">Resources</h3>
+              <ul className="space-y-2 text-sm text-muted-foreground">
+                <li><Link href="/features" className="hover:text-foreground transition-colors">Features</Link></li>
+                <li><Link href="/use-cases" className="hover:text-foreground transition-colors">Use Cases</Link></li>
+                <li><Link href="/compare" className="hover:text-foreground transition-colors">Compare</Link></li>
+                <li><Link href="/docs" className="hover:text-foreground transition-colors">Documentation</Link></li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="font-semibold text-foreground mb-4">Company</h3>
+              <ul className="space-y-2 text-sm text-muted-foreground">
+                <li><Link href="/about" className="hover:text-foreground transition-colors">About</Link></li>
+                <li><Link href="/contact" className="hover:text-foreground transition-colors">Contact</Link></li>
+                <li><Link href="https://github.com/Itsnishant4/BrandCn" target="_blank" rel="noopener noreferrer" className="hover:text-foreground transition-colors">GitHub</Link></li>
+                <li><Link href="https://x.com/NishantPat78737" target="_blank" rel="noopener noreferrer" className="hover:text-foreground transition-colors">Twitter</Link></li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="font-semibold text-foreground mb-4">Legal</h3>
+              <ul className="space-y-2 text-sm text-muted-foreground">
+                <li><Link href="/privacy" className="hover:text-foreground transition-colors">Privacy Policy</Link></li>
+                <li><Link href="/terms" className="hover:text-foreground transition-colors">Terms of Service</Link></li>
+                <li><Link href="/license" className="hover:text-foreground transition-colors">License</Link></li>
+              </ul>
+            </div>
+          </div>
+          <div className="border-t pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+            <p className="text-sm text-muted-foreground">Built with ❤️ and Shadcn UI. Open source and free to use.</p>
+            <div className="flex gap-6 text-sm text-muted-foreground">
+              <span>© 2026 BrandCn</span>
+            </div>
           </div>
         </div>
       </footer>

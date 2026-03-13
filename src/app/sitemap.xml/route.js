@@ -26,7 +26,17 @@ ${fallbackRoutes.map(route => `  <url>
 
 export async function GET() {
   const baseUrl = 'https://brand-cn.vercel.app'
-  const staticRoutes = ['', '/themes']
+  const staticRoutes = [
+    '',
+    '/themes',
+    '/features',
+    '/use-cases',
+    '/compare',
+    '/about',
+    '/privacy',
+    '/terms',
+    '/license'
+  ]
 
   const supabase = getSupabaseClient()
   if (!supabase) {

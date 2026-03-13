@@ -487,21 +487,42 @@ function ThemesContent() {
 
                 {hasNextPage && search === '' && category === 'all' && !loading && (
                     <div className="flex justify-center mx-auto py-8 pt-4">
-                        <Button
-                            onClick={loadMoreThemes}
-                            disabled={loadingMore}
-                            variant="outline"
-                            className="mx-auto"
-                        >
-                            {loadingMore ? (
-                                <>
-                                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                                    Loading...
-                                </>
-                            ) : (
-                                'Load More Themes'
+                        <div className="flex items-center gap-2">
+                            {currentPage > 1 && (
+                                <Button
+                                    onClick={() => fetchThemes(currentPage - 1, false)}
+                                    variant="outline"
+                                    size="sm"
+                                >
+                                    Previous
+                                </Button>
                             )}
-                        </Button>
+                            <div className="flex items-center gap-1">
+                                {[1, 2, 3, 4, 5].map((pageNum) => {
+                                    if (pageNum > 10) return null;
+                                    return (
+                                        <Button
+                                            key={pageNum}
+                                            onClick={() => fetchThemes(pageNum, false)}
+                                            variant={pageNum === currentPage ? "default" : "outline"}
+                                            size="sm"
+                                            className="w-9"
+                                        >
+                                            {pageNum}
+                                        </Button>
+                                    );
+                                })}
+                            </div>
+                            {hasNextPage && (
+                                <Button
+                                    onClick={() => fetchThemes(currentPage + 1, false)}
+                                    variant="outline"
+                                    size="sm"
+                                >
+                                    Next
+                                </Button>
+                            )}
+                        </div>
                     </div>
                 )}
             </div>
