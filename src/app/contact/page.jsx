@@ -70,10 +70,10 @@ export default function ContactPage() {
               For business inquiries or general questions.
             </p>
             <a 
-              href="mailto:hello@brandcn.dev" 
+              href="mailto:patelnishant2006@gmail.com" 
               className="text-primary hover:underline"
             >
-              hello@brandcn.dev →
+              patelnishant2006@gmail.com
             </a>
           </div>
 
