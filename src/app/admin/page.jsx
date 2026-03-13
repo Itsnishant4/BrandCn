@@ -1,92 +1,92 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Plus, Edit, Loader2, Lock } from 'lucide-react'
 import Link from 'next/link'
+import { supabase } from '@/lib/supabase'
+import { toast } from 'sonner'
 
 export default function AdminPage() {
-    const [isAuthenticated, setIsAuthenticated] = useState(false)
-    const [password, setPassword] = useState('')
-    const [authLoading, setAuthLoading] = useState(false)
-    const [authError, setAuthError] = useState('')
-    const [themes, setThemes] = useState([])
+    const router = useRouter()
+    
+    const [user, setUser] = useState(null)
+    const [isAdmin, setIsAdmin] = useState(false)
     const [loading, setLoading] = useState(true)
+    const [themes, setThemes] = useState([])
+    const [themeLoading, setThemeLoading] = useState(true)
     const [loadingMore, setLoadingMore] = useState(false)
     const [currentPage, setCurrentPage] = useState(1)
-    const [hasMore, setHasMore] = useState(true)
     const [hasMorePages, setHasMorePages] = useState(true)
 
     useEffect(() => {
-        const authStatus = localStorage.getItem('adminAuthenticated')
-        if (authStatus === 'true') {
-            setIsAuthenticated(true)
-        }
-        fetchThemes()
+        checkUser()
     }, [])
 
     useEffect(() => {
-        // Add scroll event listener to window for infinite scroll
-        const handleWindowScroll = () => {
-            const scrollTop = window.pageYOffset || document.documentElement.scrollTop
-            const windowHeight = window.innerHeight
-            const bodyHeight = document.documentElement.scrollHeight
-            const isNearBottom = scrollTop + windowHeight >= bodyHeight - 100
+        if (user && isAdmin) {
+            fetchThemes()
+        }
+    }, [user, isAdmin])
 
-            if (isNearBottom && hasMorePages && !loadingMore) {
-                loadMoreThemes()
+    const checkUser = async () => {
+        if (!supabase) {
+            setLoading(false)
+            return
+        }
+        
+        const { data: { user } } = await supabase.auth.getUser()
+        
+        if (user) {
+            setUser(user)
+            
+            const { data: profile } = await supabase
+                .from('profiles')
+                .select('is_admin')
+                .eq('id', user.id)
+                .maybeSingle()
+
+            
+            
+            if (profile?.is_admin === true) {
+                setIsAdmin(true)
+                router.refresh()
+            } else {
+                toast.error('Login successful but you are not an admin.')
             }
         }
+        setLoading(false)
+    }
 
-        if (isAuthenticated) {
-            window.addEventListener('scroll', handleWindowScroll)
-            return () => window.removeEventListener('scroll', handleWindowScroll)
-        }
-    }, [isAuthenticated, hasMorePages, loadingMore])
+    const handleLogin = async (email, password) => {
+        const { error } = await supabase.auth.signInWithPassword({
+            email,
+            password
+        })
 
-    const handleLogin = async () => {
-        if (!password.trim()) {
-            setAuthError('Please enter a password')
+        if (error) {
+            toast.error(error.message)
             return
         }
 
-        setAuthLoading(true)
-        setAuthError('')
-
-        // Check against environment variable
-        const correctPassword = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || 'admin123'
-
-        if (password === correctPassword) {
-            setIsAuthenticated(true)
-            localStorage.setItem('adminAuthenticated', 'true')
-        } else {
-            setAuthError('Invalid password')
-        }
-
-        setAuthLoading(false)
+        await checkUser()
     }
 
-    const handleLogout = () => {
-        setIsAuthenticated(false)
-        setPassword('')
-        setAuthError('')
-        localStorage.removeItem('adminAuthenticated')
-    }
-
-    const handleKeyPress = (e) => {
-        if (e.key === 'Enter') {
-            handleLogin()
-        }
+    const handleLogout = async () => {
+        await supabase.auth.signOut()
+        setUser(null)
+        setIsAdmin(false)
+        setThemes([])
     }
 
     const fetchThemes = async (page = 1, append = false) => {
         try {
-            const isLoadingMore = append
             setLoadingMore(append)
-            setLoading(!append)
+            setThemeLoading(!append)
 
             const response = await fetch(`/api/themes?page=${page}&limit=12`)
             if (response.ok) {
@@ -98,7 +98,6 @@ export default function AdminPage() {
                     setThemes(data.themes || [])
                 }
 
-                setHasMore(data.pagination.hasNext)
                 setHasMorePages(page < data.pagination.totalPages)
                 if (append) {
                     setCurrentPage(page)
@@ -107,7 +106,7 @@ export default function AdminPage() {
         } catch (error) {
             console.error('Error fetching themes:', error)
         } finally {
-            setLoading(false)
+            setThemeLoading(false)
             setLoadingMore(false)
         }
     }
@@ -119,6 +118,24 @@ export default function AdminPage() {
         }
     }
 
+    useEffect(() => {
+        if (!isAdmin || themeLoading) return
+
+        const handleWindowScroll = () => {
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop
+            const windowHeight = window.innerHeight
+            const bodyHeight = document.documentElement.scrollHeight
+            const isNearBottom = scrollTop + windowHeight >= bodyHeight - 100
+
+            if (isNearBottom && hasMorePages && !loadingMore) {
+                loadMoreThemes()
+            }
+        }
+
+        window.addEventListener('scroll', handleWindowScroll)
+        return () => window.removeEventListener('scroll', handleWindowScroll)
+    }, [isAdmin, themeLoading, hasMorePages, loadingMore, currentPage])
+
     if (loading) {
         return (
             <div className="min-h-screen flex items-center justify-center">
@@ -127,55 +144,8 @@ export default function AdminPage() {
         )
     }
 
-    if (!isAuthenticated) {
-        return (
-            <div className="min-h-screen flex items-center justify-center bg-muted/10">
-                <Card className="w-full max-w-md">
-                    <CardHeader className="text-center">
-                        <div className="mx-auto w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-4">
-                            <Lock className="w-6 h-6 text-primary" />
-                        </div>
-                        <CardTitle className="text-2xl">Admin Access</CardTitle>
-                        <p className="text-muted-foreground">Enter the admin password to continue</p>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                        <div>
-                            <Input
-                                type="password"
-                                placeholder="Enter password"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                onKeyPress={handleKeyPress}
-                                className="w-full"
-                            />
-                            {authError && (
-                                <p className="text-sm text-destructive mt-2">{authError}</p>
-                            )}
-                        </div>
-                        <Button
-                            onClick={handleLogin}
-                            disabled={authLoading}
-                            className="w-full"
-                        >
-                            {authLoading ? (
-                                <>
-                                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                                    Logging in...
-                                </>
-                            ) : (
-                                <>
-                                    <Lock className="w-4 h-4 mr-2" />
-                                    Access Admin
-                                </>
-                            )}
-                        </Button>
-                        <p className="text-xs text-muted-foreground text-center">
-                            Session persists until browser refresh
-                        </p>
-                    </CardContent>
-                </Card>
-            </div>
-        )
+    if (!user || !isAdmin) {
+        return <AdminLogin onLogin={handleLogin} />
     }
 
     return (
@@ -247,6 +217,74 @@ export default function AdminPage() {
                     </div>
                 )}
             </div>
+        </div>
+    )
+}
+
+function AdminLogin({ onLogin }) {
+    const [email, setEmail] = useState('')
+    const [password, setPassword] = useState('')
+    const [loading, setLoading] = useState(false)
+
+    const handleSubmit = async (e) => {
+        e.preventDefault()
+        setLoading(true)
+        await onLogin(email, password)
+        setLoading(false)
+    }
+
+    return (
+        <div className="min-h-screen flex items-center justify-center bg-muted/10">
+            <Card className="w-full max-w-md">
+                <CardHeader className="text-center">
+                    <div className="mx-auto w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-4">
+                        <Lock className="w-6 h-6 text-primary" />
+                    </div>
+                    <CardTitle className="text-2xl">Admin Access</CardTitle>
+                    <p className="text-muted-foreground">Sign in with your admin credentials</p>
+                </CardHeader>
+                <CardContent>
+                    <form onSubmit={handleSubmit} className="space-y-4">
+                        <div>
+                            <Input
+                                type="email"
+                                placeholder="Admin email"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                className="w-full"
+                                required
+                            />
+                        </div>
+                        <div>
+                            <Input
+                                type="password"
+                                placeholder="Password"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                className="w-full"
+                                required
+                            />
+                        </div>
+                        <Button
+                            type="submit"
+                            disabled={loading}
+                            className="w-full"
+                        >
+                            {loading ? (
+                                <>
+                                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                    Signing in...
+                                </>
+                            ) : (
+                                <>
+                                    <Lock className="w-4 h-4 mr-2" />
+                                    Sign In
+                                </>
+                            )}
+                        </Button>
+                    </form>
+                </CardContent>
+            </Card>
         </div>
     )
 }

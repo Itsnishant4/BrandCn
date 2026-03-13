@@ -1,10 +1,11 @@
 import { Button } from "@/components/ui/button"
 import { Copy } from "lucide-react"
+import { toast } from "sonner"
 
 export function CodeBlock({ code }) {
     const copyCode = () => {
         navigator.clipboard.writeText(code)
-        alert('Code copied!')
+        toast.success('Code copied!')
     }
 
     return (

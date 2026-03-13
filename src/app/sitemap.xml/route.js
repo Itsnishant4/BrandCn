@@ -1,16 +1,38 @@
-import { NextResponse } from 'next/server'
-import { supabase } from '@/lib/supabase'
+import { getSupabaseClient } from '@/lib/supabase'
+
+function generateFallbackSitemap(staticRoutes, baseUrl) {
+  const fallbackRoutes = staticRoutes.map(route => ({
+    url: route,
+    lastModified: new Date()
+  }))
+
+  const sitemapXml = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${fallbackRoutes.map(route => `  <url>
+    <loc>${baseUrl}${route.url}</loc>
+    <lastmod>${route.lastModified.toISOString()}</lastmod>
+    <priority>${route.url === '' ? '1.0' : '0.7'}</priority>
+    <changefreq>weekly</changefreq>
+  </url>`).join('\n')}
+</urlset>`
+
+  return new Response(sitemapXml, {
+    headers: {
+      'Content-Type': 'application/xml',
+      'Cache-Control': 'public, s-maxage=86400, stale-while-revalidate=86400'
+    }
+  })
+}
 
 export async function GET() {
-  const baseUrl = 'https://brand-cn.vercel.app' // Your actual domain
+  const baseUrl = 'https://brand-cn.vercel.app'
+  const staticRoutes = ['', '/themes']
 
-  // Static routes
-  const staticRoutes = [
-    '',
-    '/themes',
-  ]
+  const supabase = getSupabaseClient()
+  if (!supabase) {
+    return generateFallbackSitemap(staticRoutes, baseUrl)
+  }
 
-  // Get dynamic theme routes
   try {
     const { data: themes, error } = await supabase
       .from('themes')
@@ -24,7 +46,6 @@ export async function GET() {
       lastModified: new Date(theme.updated_at)
     })) || []
 
-    // Combine all routes
     const allRoutes = [
       ...staticRoutes.map(route => ({
         url: route,
@@ -33,7 +54,6 @@ export async function GET() {
       ...themeRoutes
     ]
 
-    // Generate sitemap XML
     const sitemapXml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 ${allRoutes.map(route => `  <url>
@@ -52,28 +72,6 @@ ${allRoutes.map(route => `  <url>
     })
   } catch (error) {
     console.error('Error generating sitemap:', error)
-
-    // Fallback sitemap with just static routes
-    const fallbackRoutes = staticRoutes.map(route => ({
-      url: route,
-      lastModified: new Date()
-    }))
-
-    const sitemapXml = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-${fallbackRoutes.map(route => `  <url>
-    <loc>${baseUrl}${route.url}</loc>
-    <lastmod>${route.lastModified.toISOString()}</lastmod>
-    <priority>${route.url === '' ? '1.0' : '0.7'}</priority>
-    <changefreq>weekly</changefreq>
-  </url>`).join('\n')}
-</urlset>`
-
-    return new Response(sitemapXml, {
-      headers: {
-        'Content-Type': 'application/xml',
-        'Cache-Control': 'public, s-maxage=86400, stale-while-revalidate=86400'
-      }
-    })
+    return generateFallbackSitemap(staticRoutes, baseUrl)
   }
 }

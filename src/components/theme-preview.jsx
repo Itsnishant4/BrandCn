@@ -7,9 +7,16 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
 
 function scopeThemeCss(css) {
-    return css
+    let scoped = css
         .replace(/:root/g, ".theme-preview")
         .replace(/\.dark\b/g, ".theme-preview.dark")
+
+    // Auto-wrap raw HSL values (e.g., 217 9% 18%) in hsl() for Tailwind 4 compatibility
+    scoped = scoped.replace(/(--[a-zA-Z0-9-]+)\s*:\s*(\d+(?:\.\d+)?(?:deg|rad|grad|turn)?\s+\d+(?:\.\d+)?%\s+\d+(?:\.\d+)?%)\s*([;!\}]|$)/g, (match, prop, val, suffix) => {
+        return `${prop}: hsl(${val})${suffix}`;
+    });
+
+    return scoped
 }
 
 export function ThemePreview({ code }) {
